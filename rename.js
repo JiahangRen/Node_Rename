@@ -43,7 +43,7 @@
 const inArg = $arguments; // console.log(inArg)
 const nx = inArg.nx || false,
   bl = inArg.bl || false,
-  nf = inArg.nf || ture,
+  nf = inArg.nf || true,
   key = inArg.key || false,
   blgd = inArg.blgd || false,
   blpx = inArg.blpx || false,

@@ -135,164 +135,249 @@ const rurekey = {
 function operator(pro) {
   const Allmap = {};
   const outList = getList(outputName);
-  let inputList,
-    retainKey = "";
+  let inputList, retainKey = "";
   if (inname !== "") {
-    inputList = [getList(inname)];
+      inputList = [getList(inname)];
   } else {
-    inputList = [ZH, FG, QC, EN];
+      inputList = [ZH, FG, QC, EN];
   }
 
   inputList.forEach((arr) => {
-    arr.forEach((value, valueIndex) => {
-      Allmap[value] = outList[valueIndex];
-    });
+      arr.forEach((value, valueIndex) => {
+          Allmap[value] = outList[valueIndex];
+      });
   });
 
   if (clear || nx || blnx || key) {
-    pro = pro.filter((res) => {
-      const resname = res.name;
-      const shouldKeep =
-        !(clear && nameclear.test(resname)) &&
-        !(nx && namenx.test(resname)) &&
-        !(blnx && !nameblnx.test(resname)) &&
-        !(key && !(keya.test(resname) && /2|4|6|7/i.test(resname)));
-      return shouldKeep;
-    });
+      pro = pro.filter((res) => {
+          const resname = res.name;
+          return !(clear && nameclear.test(resname)) &&
+                 !(nx && namenx.test(resname)) &&
+                 !(blnx && !nameblnx.test(resname)) &&
+                 !(key && !(keya.test(resname) && /2|4|6|7/i.test(resname)));
+      });
   }
 
-  const BLKEYS = BLKEY ? BLKEY.split("+") : "";
+  const BLKEYS = BLKEY ? BLKEY.split("+") : [];
 
   pro.forEach((e) => {
-    // 预处理 防止预判或遗漏
-    Object.keys(rurekey).forEach((ikey) => {
-      if (rurekey[ikey].test(e.name)) {
-        e.name = e.name.replace(rurekey[ikey], ikey);
-      }
-    });
-
-    if (blockquic == "on") {
-      e["block-quic"] = "on";
-    } else if (blockquic == "off") {
-      e["block-quic"] = "off";
-    } else {
-      delete e["block-quic"];
-    }
-
-    // 自定义
-    if (BLKEY) {
-      let BLKEY_REPLACE = "",
-        re = false;
-      BLKEYS.forEach((i) => {
-        if (i.includes(">") && e.name.includes(i.split(">")[0])) {
-          if (i.split(">")[1]) {
-            BLKEY_REPLACE = i.split(">")[1];
-            re = true;
+      Object.keys(rurekey).forEach((ikey) => {
+          if (rurekey[ikey].test(e.name)) {
+              e.name = e.name.replace(rurekey[ikey], ikey);
           }
-        }
       });
-      retainKey = re
-        ? BLKEY_REPLACE
-        : BLKEYS.filter((items) => e.name.includes(items));
-    }
 
-    let ikey = "",
-      ikeys = "";
-    // 保留固定格式 倍率
-    if (blgd) {
-      regexArray.forEach((regex, index) => {
-        if (regex.test(e.name)) {
-          ikeys = valueArray[index];
-        }
-      });
-    }
-
-    // 正则 匹配倍率
-    if (bl) {
-      const match = e.name.match(
-        /((倍率|X|x|×)\D?((\d{1,3}\.)?\d+)\D?)|((\d{1,3}\.)?\d+)(倍|X|x|×)/
-      );
-      if (match) {
-        const rev = match[0].match(/(\d[\d.]*)/)[0];
-        if (rev !== "1") {
-          const newValue = rev + "×";
-          ikey = newValue;
-        }
-      }
-    }
-    // 查找对应的地区名称
-    const findKey = Object.entries(Allmap).find(([key]) =>
-      e.name.includes(key)
-    );
-
-    if (findKey?.[1]) {
-      const findKeyValue = findKey[1];
-      let keyover = [],
-          usflag = "";
-
-      if (addflag) {
-        const index = outList.indexOf(findKeyValue);
-        if (index !== -1) {
-          usflag = FG[index];
-          usflag = usflag === "🇹🇼" ? "🇨🇳" : usflag;
-        }
-      }
-
-      // 将 FNAME（机场名称前缀）、国旗、节点名称等拼接
-      keyover = keyover.concat(FNAME, usflag, findKeyValue, retainKey, ikey, ikeys).filter((k) => k !== "");
-      
-      // 使用 FGF 作为连接符连接所有部分
-      e.name = keyover.join(FGF);
-    } else {
-      if (nm) {
-        e.name = `${FNAME}${FGF}${e.name}`;
+      if (blockquic === "on") {
+          e["block-quic"] = "on";
+      } else if (blockquic === "off") {
+          e["block-quic"] = "off";
       } else {
-        e.name = null;
+          delete e["block-quic"];
       }
-    }
-  });
-  //   // 匹配 Allkey 地区
-  //   const findKey = Object.entries(Allmap).find(([key]) =>
-  //     e.name.includes(key)
-  //   );
-  //   let firstName = "",
-  //     nNames = "";
 
-  //   if (nf) {
-  //     firstName = FNAME;
-  //   } else {
-  //     nNames = FNAME;
-  //   }
-  //   if (findKey?.[1]) {
-  //     const findKeyValue = findKey[1];
-  //     let keyover = [],
-  //       usflag = "";
-  //     if (addflag) {
-  //       const index = outList.indexOf(findKeyValue);
-  //       if (index !== -1) {
-  //         usflag = FG[index];
-  //         usflag = usflag === "🇹🇼" ? "🇨🇳" : usflag;
-  //       }
-  //     }
-  //     keyover = keyover
-  //       .concat(firstName, usflag, nNames, findKeyValue, retainKey, ikey, ikeys)
-  //       .filter((k) => k !== "");
-  //     e.name = keyover.join(FGF);
-  //   } else {
-  //     if (nm) {
-  //       e.name = FNAME + FGF + e.name;
-  //     } else {
-  //       e.name = null;
-  //     }
-  //   }
-  // });
+      let BLKEY_REPLACE = "",
+          re = false;
+      BLKEYS.forEach((i) => {
+          if (i.includes(">") && e.name.includes(i.split(">")[0])) {
+              if (i.split(">")[1]) {
+                  BLKEY_REPLACE = i.split(">")[1];
+                  re = true;
+              }
+          }
+      });
+
+      retainKey = re ? BLKEY_REPLACE : BLKEYS.filter((items) => e.name.includes(items)).join('');
+
+      let ikey = "",
+          ikeys = "";
+      if (blgd) {
+          regexArray.forEach((regex, index) => {
+              if (regex.test(e.name)) {
+                  ikeys = valueArray[index];
+              }
+          });
+      }
+
+      if (bl) {
+          const match = e.name.match(/((倍率|X|x|×)\D?((\d{1,3}\.)?\d+)\D?)|((\d{1,3}\.)?\d+)(倍|X|x|×)/);
+          if (match) {
+              const rev = match[0].match(/(\d[\d.]*)/)[0];
+              if (rev !== "1") {
+                  const newValue = rev + "×";
+                  ikey = newValue;
+              }
+          }
+      }
+
+      const findKey = Object.entries(Allmap).find(([key]) => e.name.includes(key));
+      if (findKey?.[1]) {
+          let keyover = [];
+          if (addflag) {
+              const index = outList.indexOf(findKey[1]);
+              if (index !== -1) {
+                  const usflag = FG[index] === "🇹🇼" ? "🇨🇳" : FG[index];
+                  keyover.push(usflag);
+              }
+          }
+          if (e.subName) {
+              keyover.push(e.subName);
+          }
+          keyover.push(findKey[1], retainKey, ikey, ikeys);
+          e.name = keyover.filter((k) => k !== "").join(FGF);
+      } else {
+          if (nm) {
+              e.name = (e.subName ? e.subName + FGF : '') + e.name;
+          } else {
+              e.name = null;
+          }
+      }
+  });
+
   pro = pro.filter((e) => e.name !== null);
   jxh(pro);
-  numone && oneP(pro);
-  blpx && (pro = fampx(pro));
-  key && (pro = pro.filter((e) => !keyb.test(e.name)));
+  if (numone) {
+      oneP(pro);
+  }
+  if (blpx) {
+      pro = fampx(pro);
+  }
+  if (key) {
+      pro = pro.filter((e) => !keyb.test(e.name));
+  }
   return pro;
 }
+
+// function operator(pro) {
+//   const Allmap = {};
+//   const outList = getList(outputName);
+//   let inputList,
+//     retainKey = "";
+//   if (inname !== "") {
+//     inputList = [getList(inname)];
+//   } else {
+//     inputList = [ZH, FG, QC, EN];
+//   }
+
+//   inputList.forEach((arr) => {
+//     arr.forEach((value, valueIndex) => {
+//       Allmap[value] = outList[valueIndex];
+//     });
+//   });
+
+//   if (clear || nx || blnx || key) {
+//     pro = pro.filter((res) => {
+//       const resname = res.name;
+//       const shouldKeep =
+//         !(clear && nameclear.test(resname)) &&
+//         !(nx && namenx.test(resname)) &&
+//         !(blnx && !nameblnx.test(resname)) &&
+//         !(key && !(keya.test(resname) && /2|4|6|7/i.test(resname)));
+//       return shouldKeep;
+//     });
+//   }
+
+//   const BLKEYS = BLKEY ? BLKEY.split("+") : "";
+
+//   pro.forEach((e) => {
+//     // 预处理 防止预判或遗漏
+//     Object.keys(rurekey).forEach((ikey) => {
+//       if (rurekey[ikey].test(e.name)) {
+//         e.name = e.name.replace(rurekey[ikey], ikey);
+//       }
+//     });
+
+//     if (blockquic == "on") {
+//       e["block-quic"] = "on";
+//     } else if (blockquic == "off") {
+//       e["block-quic"] = "off";
+//     } else {
+//       delete e["block-quic"];
+//     }
+
+//     // 自定义
+//     if (BLKEY) {
+//       let BLKEY_REPLACE = "",
+//         re = false;
+//       BLKEYS.forEach((i) => {
+//         if (i.includes(">") && e.name.includes(i.split(">")[0])) {
+//           if (i.split(">")[1]) {
+//             BLKEY_REPLACE = i.split(">")[1];
+//             re = true;
+//           }
+//         }
+//       });
+//       retainKey = re
+//         ? BLKEY_REPLACE
+//         : BLKEYS.filter((items) => e.name.includes(items));
+//     }
+
+//     let ikey = "",
+//       ikeys = "";
+//     // 保留固定格式 倍率
+//     if (blgd) {
+//       regexArray.forEach((regex, index) => {
+//         if (regex.test(e.name)) {
+//           ikeys = valueArray[index];
+//         }
+//       });
+//     }
+
+//     // 正则 匹配倍率
+//     if (bl) {
+//       const match = e.name.match(
+//         /((倍率|X|x|×)\D?((\d{1,3}\.)?\d+)\D?)|((\d{1,3}\.)?\d+)(倍|X|x|×)/
+//       );
+//       if (match) {
+//         const rev = match[0].match(/(\d[\d.]*)/)[0];
+//         if (rev !== "1") {
+//           const newValue = rev + "×";
+//           ikey = newValue;
+//         }
+//       }
+//     }
+    
+//     // 匹配 Allkey 地区
+//     const findKey = Object.entries(Allmap).find(([key]) =>
+//       e.name.includes(key)
+//     );
+//     let firstName = "",
+//       nNames = "";
+
+//     if (nf) {
+//       firstName = FNAME;
+//     } else {
+//       nNames = FNAME;
+//     }
+//     if (findKey?.[1]) {
+//       const findKeyValue = findKey[1];
+//       let keyover = [],
+//         usflag = "";
+//       if (addflag) {
+//         const index = outList.indexOf(findKeyValue);
+//         if (index !== -1) {
+//           usflag = FG[index];
+//           usflag = usflag === "🇹🇼" ? "🇨🇳" : usflag;
+//         }
+//       }
+//       keyover = keyover
+//         .concat(firstName, usflag, nNames, findKeyValue, retainKey, ikey, ikeys)
+//         .filter((k) => k !== "");
+//       e.name = keyover.join(FGF);
+//     } else {
+//       if (nm) {
+//         e.name = FNAME + FGF + e.name;
+//       } else {
+//         e.name = null;
+//       }
+//     }
+//   });
+//   pro = pro.filter((e) => e.name !== null);
+//   jxh(pro);
+//   numone && oneP(pro);
+//   blpx && (pro = fampx(pro));
+//   key && (pro = pro.filter((e) => !keyb.test(e.name)));
+//   return pro;
+// }
 
 // prettier-ignore
 function getList(arg) { switch (arg) { case 'us': return EN; case 'gq': return FG; case 'quan': return QC; default: return ZH; }}

@@ -1,5 +1,5 @@
 /**
- * 更新日期：2024-03-24 11:35:50
+ * 更新日期：2024-02-26 18:42:56
  * 用法：Sub-Store 脚本操作添加
  * rename.js 以下是此脚本支持的参数，必须以 # 为开头多个参数使用"&"连接，参考上述地址为例使用参数。 禁用缓存url#noCache
  *
@@ -233,7 +233,7 @@ function operator(pro) {
     } else {
       nNames = FNAME;
     }
-    let subNamePrefix = e.subName ? `${e.subName} ` : "";
+    let subNamePrefix = e.subName ? e.subName.trim() : "";
 
     if (findKey?.[1]) {
       const findKeyValue = findKey[1];

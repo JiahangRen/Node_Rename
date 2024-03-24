@@ -43,7 +43,7 @@
 const inArg = $arguments; // console.log(inArg)
 const nx = inArg.nx || false,
   bl = inArg.bl || false,
-  nf = inArg.nf || true,
+  nf = inArg.nf || false,
   key = inArg.key || false,
   blgd = inArg.blgd || false,
   blpx = inArg.blpx || false,
@@ -220,23 +220,16 @@ function operator(pro) {
         }
       }
     }
-
-    // 匹配 Allkey 地区
+    // 查找对应的地区名称
     const findKey = Object.entries(Allmap).find(([key]) =>
       e.name.includes(key)
     );
-    let firstName = "",
-      nNames = "";
 
-    if (nf) {
-      firstName = FNAME;
-    } else {
-      nNames = FNAME;
-    }
     if (findKey?.[1]) {
       const findKeyValue = findKey[1];
       let keyover = [],
-        usflag = "";
+          usflag = "";
+
       if (addflag) {
         const index = outList.indexOf(findKeyValue);
         if (index !== -1) {
@@ -244,18 +237,55 @@ function operator(pro) {
           usflag = usflag === "🇹🇼" ? "🇨🇳" : usflag;
         }
       }
-      keyover = keyover
-        .concat(firstName, usflag, nNames, findKeyValue, retainKey, ikey, ikeys)
-        .filter((k) => k !== "");
+
+      // 将 FNAME（机场名称前缀）、国旗、节点名称等拼接
+      keyover = keyover.concat(FNAME, usflag, findKeyValue, retainKey, ikey, ikeys).filter((k) => k !== "");
+      
+      // 使用 FGF 作为连接符连接所有部分
       e.name = keyover.join(FGF);
     } else {
       if (nm) {
-        e.name = FNAME + FGF + e.name;
+        e.name = `${FNAME}${FGF}${e.name}`;
       } else {
         e.name = null;
       }
     }
   });
+  //   // 匹配 Allkey 地区
+  //   const findKey = Object.entries(Allmap).find(([key]) =>
+  //     e.name.includes(key)
+  //   );
+  //   let firstName = "",
+  //     nNames = "";
+
+  //   if (nf) {
+  //     firstName = FNAME;
+  //   } else {
+  //     nNames = FNAME;
+  //   }
+  //   if (findKey?.[1]) {
+  //     const findKeyValue = findKey[1];
+  //     let keyover = [],
+  //       usflag = "";
+  //     if (addflag) {
+  //       const index = outList.indexOf(findKeyValue);
+  //       if (index !== -1) {
+  //         usflag = FG[index];
+  //         usflag = usflag === "🇹🇼" ? "🇨🇳" : usflag;
+  //       }
+  //     }
+  //     keyover = keyover
+  //       .concat(firstName, usflag, nNames, findKeyValue, retainKey, ikey, ikeys)
+  //       .filter((k) => k !== "");
+  //     e.name = keyover.join(FGF);
+  //   } else {
+  //     if (nm) {
+  //       e.name = FNAME + FGF + e.name;
+  //     } else {
+  //       e.name = null;
+  //     }
+  //   }
+  // });
   pro = pro.filter((e) => e.name !== null);
   jxh(pro);
   numone && oneP(pro);

@@ -249,7 +249,7 @@ function operator(pro) {
       keyover = keyover
         .concat(subNamePrefix, firstName, usflag, nNames, findKeyValue, retainKey, ikey, ikeys)
         .filter((k) => k !== "");
-      e.name = keyover.join(FGF);
+      e.name = keyover.join("");
     } else {
       if (nm) {
         e.name = FNAME + FGF + e.name;

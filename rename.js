@@ -248,8 +248,14 @@ function operator(pro) {
       }
       keyover = keyover
         .concat(subNamePrefix, firstName, usflag, nNames, findKeyValue, retainKey, ikey, ikeys)
+        .map(item => item.trim())  // 确保每个元素都没有额外的空格
         .filter((k) => k !== "");
-      e.name = keyover.join("");
+      e.name = keyover.join("");  // 使用空字符串连接
+
+      // keyover = keyover
+      //   .concat(subNamePrefix, firstName, usflag, nNames, findKeyValue, retainKey, ikey, ikeys)
+      //   .filter((k) => k !== "");
+      // e.name = keyover.join(FGF);
     } else {
       if (nm) {
         e.name = FNAME + FGF + e.name;

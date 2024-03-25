@@ -2726,3 +2726,15 @@ DOMAIN,klink5-lf.amemv.com
 DOMAIN,sf6-cdn-tos.douyinstatic.com
 DOMAIN,tp-pay.snssdk.com
 DOMAIN,sq.bls.mdt.qq.com
+DOMAIN,pic1.zhimg.com
+DOMAIN,pic2.zhimg.com
+DOMAIN,pic3.zhimg.com
+DOMAIN,pic4.zhimg.com
+DOMAIN,h5.sinaimg.cn
+DOMAIN,ipa.im.weibo.cn
+DOMAIN,dp.im.wei.cn
+DOMAIN,gw.im.weibo.cn
+DOMAIN, gw1.im.weibo.cn
+DOMAIN-SUFFIX,biz.weibo.com
+DOMAIN-SUFFIX,sdkapp.uve.weibo.com
+DOMAIN-SUFFIX,ip.taobao.com

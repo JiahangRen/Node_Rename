@@ -1,5 +1,5 @@
 /**
- * 更新日期：2024-04-05 15:30:15
+ * 更新日期：2024-03-24 12:39:20
  * 用法：Sub-Store 脚本操作添加
  * rename.js 以下是此脚本支持的参数，必须以 # 为开头多个参数使用"&"连接，参考上述地址为例使用参数。 禁用缓存url#noCache
  *
@@ -43,7 +43,7 @@
 const inArg = $arguments; // console.log(inArg)
 const nx = inArg.nx || false,
   bl = inArg.bl || false,
-  nf = inArg.nf || true,
+  nf = inArg.nf || false,
   key = inArg.key || false,
   blgd = inArg.blgd || false,
   blpx = inArg.blpx || false,
@@ -132,12 +132,6 @@ const rurekey = {
   Esnc: /esnc/gi,
 };
 
-let GetK = false, AMK = []
-function ObjKA(i) {
-  GetK = true
-  AMK = Object.entries(i)
-}
-
 function operator(pro) {
   const Allmap = {};
   const outList = getList(outputName);
@@ -170,35 +164,13 @@ function operator(pro) {
   const BLKEYS = BLKEY ? BLKEY.split("+") : "";
 
   pro.forEach((e) => {
-    let bktf = false, ens = e.name
     // 预处理 防止预判或遗漏
     Object.keys(rurekey).forEach((ikey) => {
       if (rurekey[ikey].test(e.name)) {
         e.name = e.name.replace(rurekey[ikey], ikey);
-      if (BLKEY) {
-        bktf = true
-        let BLKEY_REPLACE = "",
-        re = false;
-      BLKEYS.forEach((i) => {
-        if (i.includes(">") && ens.includes(i.split(">")[0])) {
-          if (rurekey[ikey].test(i.split(">")[0])) {
-              e.name += " " + i.split(">")[0]
-            }
-          if (i.split(">")[1]) {
-            BLKEY_REPLACE = i.split(">")[1];
-            re = true;
-          }
-        } else {
-          if (ens.includes(i)) {
-             e.name += " " + i
-            }
-        }
-        retainKey = re
-        ? BLKEY_REPLACE
-        : BLKEYS.filter((items) => e.name.includes(items));
-      });}
       }
     });
+
     if (blockquic == "on") {
       e["block-quic"] = "on";
     } else if (blockquic == "off") {
@@ -208,7 +180,7 @@ function operator(pro) {
     }
 
     // 自定义
-    if (!bktf && BLKEY) {
+    if (BLKEY) {
       let BLKEY_REPLACE = "",
         re = false;
       BLKEYS.forEach((i) => {
@@ -249,12 +221,10 @@ function operator(pro) {
       }
     }
 
-    !GetK && ObjKA(Allmap)
     // 匹配 Allkey 地区
-    const findKey = AMK.find(([key]) =>
+    const findKey = Object.entries(Allmap).find(([key]) =>
       e.name.includes(key)
-    )
-    
+    );
     let firstName = "",
       nNames = "";
 
@@ -263,6 +233,8 @@ function operator(pro) {
     } else {
       nNames = FNAME;
     }
+    let subNamePrefix = e.subName ? `${e.subName} ` : "";
+
     if (findKey?.[1]) {
       const findKeyValue = findKey[1];
       let keyover = [],
@@ -275,9 +247,15 @@ function operator(pro) {
         }
       }
       keyover = keyover
-        .concat(firstName, usflag, nNames, findKeyValue, retainKey, ikey, ikeys)
+        .concat(subNamePrefix, firstName, usflag, nNames, findKeyValue, retainKey, ikey, ikeys)
+        .map(item => item.trim())  // 确保每个元素都没有额外的空格
         .filter((k) => k !== "");
-      e.name = keyover.join(FGF);
+      e.name = keyover.join("");  // 使用空字符串连接
+
+      // keyover = keyover
+      //   .concat(subNamePrefix, firstName, usflag, nNames, findKeyValue, retainKey, ikey, ikeys)
+      //   .filter((k) => k !== "");
+      // e.name = keyover.join(FGF);
     } else {
       if (nm) {
         e.name = FNAME + FGF + e.name;
@@ -292,6 +270,70 @@ function operator(pro) {
   blpx && (pro = fampx(pro));
   key && (pro = pro.filter((e) => !keyb.test(e.name)));
   return pro;
+
+  function getList(arg) {
+    switch (arg) {
+      case 'us':
+        return EN;
+      case 'gq':
+        return FG;
+      case 'quan':
+        return QC;
+      default:
+        return ZH;
+    }
+  }
+  
+  function jxh(e) {
+    const n = e.reduce((e, n) => {
+      const t = e.find((e) => e.name === n.name);
+      if (t) {
+        t.count++;
+        t.items.push({ ...n, name: `${n.name}${XHFGF}${t.count.toString().padStart(2, "0")}`, });
+      } else {
+        e.push({ name: n.name, count: 1, items: [{ ...n, name: `${n.name}${XHFGF}01` }] });
+      }
+      return e;
+    }, []);
+    const t = (typeof Array.prototype.flatMap === 'function' ? n.flatMap((e) => e.items) : n.reduce((acc, e) => acc.concat(e.items), []));
+    e.splice(0, e.length, ...t);
+    return e;
+  }
+  
+  function oneP(e) {
+    const t = e.reduce((e, t) => {
+      const n = t.name.replace(/[^A-Za-z0-9\u00C0-\u017F\u4E00-\u9FFF]+\d+$/, "");
+      if (!e[n]) {
+        e[n] = [];
+      }
+      e[n].push(t);
+      return e;
+    }, {});
+    for (const e in t) {
+      if (t[e].length === 1 && t[e][0].name.endsWith("01")) {
+        t[e][0].name = t[e][0].name.replace(/[^.]01/, "");
+      }
+    }
+    return e;
+  }
+  
+  function fampx(pro) {
+    const wis = [];
+    const wnout = [];
+    for (const proxy of pro) {
+      const fan = specialRegex.some((regex) => regex.test(proxy.name));
+      if (fan) {
+        wis.push(proxy);
+      } else {
+        wnout.push(proxy);
+      }
+    }
+    const sps = wis.map((proxy) => specialRegex.findIndex((regex) => regex.test(proxy.name)));
+    wis.sort((a, b) => sps[wis.indexOf(a)] - sps[wis.indexOf(b)] || a.name.localeCompare(b.name));
+    wnout.sort((a, b) => pro.indexOf(a) - pro.indexOf(b));
+    return wnout.concat(wis);
+  }
+  
 }
 
 // prettier-ignore
